@@ -17,6 +17,11 @@ namespace TaskBoard.Services
             this.db = db;
         }
 
+        public async Task<BoardTask> GetTaskAsync(int taskId)
+        {
+            return await db.Tasks.FindAsync(taskId);
+        }
+
         public async Task<BoardTask[]> GetBoardTasksAsync()
         {
             return await db.Tasks.ToArrayAsync();

@@ -1,0 +1,31 @@
+﻿@page "/task-details/{TaskId:int}"
+
+@using Models
+@using Services
+
+@inject TasksService TasksService
+
+@if (task == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h1>Task #@TaskId</h1>
+
+    <h2>@task.Title</h2>
+
+    <p>@task.Description</p>
+}
+
+@code {
+    [Parameter]
+    public int TaskId { get; set; }
+
+    private BoardTask task { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        task = await TasksService.GetTaskAsync(TaskId);
+    }
+}
