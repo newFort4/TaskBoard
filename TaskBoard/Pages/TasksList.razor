@@ -1,0 +1,84 @@
+﻿@page "/tasks-list"
+
+@using Services
+@using Models
+
+@inject NavigationManager NavigationManager
+@inject TasksService TasksService
+
+<h1>Tasks list</h1>
+
+@if (tasks == null)
+{
+    <p><em>Loading...</em></p>
+} else
+{
+    <div>
+        <button class="btn btn-primary" @onclick="GoToCreateNewPage">Create new task</button>
+    </div>
+    <br />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>AssignedTo</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>DeadLine</th>
+                <th>Command</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var task in tasks)
+            {
+                <tr>
+                    <td><a href="/task/@task.TaskId">@task.TaskId</a></td>
+                    <td>@task.Title</td>
+                    <td>
+                        <span class="oi oi-person"></span>
+                        @if (!string.IsNullOrEmpty(task.AssignedTo))
+                        {
+                            @task.AssignedTo
+                        }
+                        else
+                        {
+                            @("Unassigned")
+                        }
+                    </td>
+                    <td>@task.Status</td>
+                    <td>@task.Created.ToShortDateString()</td>
+                    <td>@task.DeadLine?.ToShortDateString()</td>
+                    <td>
+                        <button @onclick="async() => await Remove(task)">
+                            <span class="oi oi-trash"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private BoardTask[] tasks;
+
+    protected async override Task OnInitializedAsync()
+    {
+        tasks = await TasksService.GetBoardTasksAsync();
+    }
+
+    void GoToCreateNewPage()
+    {
+        NavigationManager.NavigateTo("create-task");
+    }
+
+    async Task Remove(BoardTask task)
+    {
+        await TasksService.RemoveTaskAsync(task);
+
+        tasks = tasks.Where(x => x != task).ToArray();
+
+        Console.WriteLine("Removed");
+    }
+}

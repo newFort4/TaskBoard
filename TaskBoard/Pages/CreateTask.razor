@@ -1,0 +1,52 @@
+@page "/create-task"
+
+@using Enums
+@using Services
+@using ViewModels
+
+@inject NavigationManager NavigationManager
+@inject TasksService TasksService
+
+<div class="col-6">
+    <EditForm Model="@createTaskModel" OnValidSubmit="async() => await HandleValidSubmit()">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <InputText id="title" class="form-control" @bind-Value="createTaskModel.Title" />
+        </div>
+        <div class="form-group">
+            <label for="type">Type:</label>
+            <InputSelect @bind-Value="createTaskModel.Type">
+                <option value="@TaskType.Bug">Bug</option>
+                <option value="@TaskType.Feature">Feature</option>
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <InputTextArea id="description" class="form-control" @bind-Value="createTaskModel.Description" />
+        </div>
+        <div class="form-group">
+            <label for="assignedTo">Assigned to:</label>
+            <InputText id="assignedTo" class="form-control" @bind-Value="createTaskModel.AssignedTo" />
+        </div>
+        <div class="form-group">
+            <label for="deadLine">DeadLine:</label>
+            <InputDate id="deadLine" class="form-control" @bind-Value="createTaskModel.DeadLine" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create</button>
+    </EditForm>
+</div>
+
+@code {
+    private CreateTaskModel createTaskModel = new CreateTaskModel();
+
+    private async Task HandleValidSubmit()
+    {
+        await TasksService.CreateAsync(createTaskModel);
+
+        NavigationManager.NavigateTo("tasks-list");
+    }
+}
