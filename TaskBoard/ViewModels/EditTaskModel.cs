@@ -1,19 +1,16 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+using System;
 using TaskBoard.Enums;
 
-namespace TaskBoard.Models
+namespace TaskBoard.ViewModels
 {
-    public class BoardTask
+    public class EditTaskModel
     {
-        [Key]
         public int TaskId { get; set; }
         public string AssignedTo { get; set; }
         public string Title { get; set; }
         public TaskType Type { get; set; }
         public Status Status { get; set; }
         public string Description { get; set; }
-        public DateTime Created { get; set; }
         public DateTime? DeadLine { get; set; }
     }
 }

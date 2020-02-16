@@ -24,7 +24,7 @@ else
 
     private BoardTask task { get; set; }
 
-    protected async override Task OnInitializedAsync()
+    protected async override Task OnParametersSetAsync()
     {
         task = await TasksService.GetTaskAsync(TaskId);
     }

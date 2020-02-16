@@ -1,7 +1,9 @@
 ﻿@page "/tasks-list"
 
+@using Enums
 @using Services
 @using Models
+@using ViewModels
 
 @inject NavigationManager NavigationManager
 @inject TasksService TasksService
@@ -13,6 +15,39 @@
     <p><em>Loading...</em></p>
 } else
 {
+    <div>
+        <EditForm class="form row" Model="@taskSearchModel" OnValidSubmit="async() => await SearchTasksAsync()">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group col-2">
+                <InputText id="title" class="form-control" @bind-Value="taskSearchModel.Title" placeholder="Title" />
+            </div>
+            <div class="form-group col-2">
+                <InputSelect class="custom-select" @bind-Value="taskSearchModel.Status" placeholder="Status">
+                    <option value="@Status.New">New</option>
+                    <option value="@Status.InProgress">In progress</option>
+                    <option value="@Status.Completed">Completed</option>
+                </InputSelect>
+            </div>
+            <div class="form-group col-2">
+                <InputSelect class="custom-select" @bind-Value="taskSearchModel.Type" placeholder="Type">
+                    <option value="@TaskType.Bug">Bug</option>
+                    <option value="@TaskType.Feature">Feature</option>
+                </InputSelect>
+            </div>
+            <div class="form-group col-2">
+                <InputText id="assignedTo" class="form-control" @bind-Value="taskSearchModel.AssignedTo" placeholder="Assigned to" />
+            </div>
+            <div class="form-group col-2">
+                <input id="deadLine" class="form-control" @bind="taskSearchModel.DeadLine" @bind:format="MM/dd/yyyy" />
+            </div>
+
+            <div class="form-group col-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </EditForm>
+    </div>
     <div>
         <button class="btn btn-primary" @onclick="GoToCreateNewPage">Create new task</button>
     </div>
@@ -50,7 +85,10 @@
                     <td>@task.Created.ToShortDateString()</td>
                     <td>@task.DeadLine?.ToShortDateString()</td>
                     <td>
-                        <button @onclick="async() => await Remove(task)">
+                        <button class="btn btn-primary" @onclick="() => Edit(task)">
+                            <span class="oi oi-pencil"></span>
+                        </button>
+                        <button class="btn btn-danger" @onclick="async() => await Remove(task)">
                             <span class="oi oi-trash"></span>
                         </button>
                     </td>
@@ -61,11 +99,18 @@
 }
 
 @code {
+    private TaskSearchModel taskSearchModel = new TaskSearchModel();
     private BoardTask[] tasks;
 
-    protected async override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
+        taskSearchModel = new TaskSearchModel();
         tasks = await TasksService.GetBoardTasksAsync();
+    }
+
+    protected async Task SearchTasksAsync()
+    {
+        tasks = await TasksService.GetBoardTasksAsync(taskSearchModel);
     }
 
     void GoToCreateNewPage()
@@ -73,12 +118,15 @@
         NavigationManager.NavigateTo("create-task");
     }
 
+    void Edit(BoardTask task)
+    {
+        NavigationManager.NavigateTo(string.Format("edit-task/{0}", task.TaskId));
+    }
+
     async Task Remove(BoardTask task)
     {
-        await TasksService.RemoveTaskAsync(task);
+        await TasksService.RemoveTaskAsync(task.TaskId);
 
         tasks = tasks.Where(x => x != task).ToArray();
-
-        Console.WriteLine("Removed");
     }
 }

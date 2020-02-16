@@ -33,7 +33,7 @@
         </div>
         <div class="form-group">
             <label for="deadLine">DeadLine:</label>
-            <InputDate id="deadLine" class="form-control" @bind-Value="createTaskModel.DeadLine" />
+            <input id="deadLine" class="form-control" @bind="createTaskModel.DeadLine" @bind:format="MM/dd/yyyy" />
         </div>
 
         <button type="submit" class="btn btn-primary">Create</button>
@@ -45,7 +45,7 @@
 
     private async Task HandleValidSubmit()
     {
-        await TasksService.CreateAsync(createTaskModel);
+        await TasksService.CreateTaskAsync(createTaskModel);
 
         NavigationManager.NavigateTo("tasks-list");
     }

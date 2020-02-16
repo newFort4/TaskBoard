@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.Serialization;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TaskBoard.Enums;
@@ -17,6 +17,22 @@ namespace TaskBoard.Services
             this.db = db;
         }
 
+        public async Task<EditTaskModel> GetTaskForEditAsync(int taskId)
+        {
+            var task = await GetTaskAsync(taskId);
+
+            return new EditTaskModel
+            {
+                TaskId = task.TaskId,
+                AssignedTo = task.AssignedTo,
+                Title = task.Title,
+                Type = task.Type,
+                Status = task.Status,
+                Description = task.Description,
+                DeadLine = task.DeadLine
+            };
+        }
+
         public async Task<BoardTask> GetTaskAsync(int taskId)
         {
             return await db.Tasks.FindAsync(taskId);
@@ -27,7 +43,32 @@ namespace TaskBoard.Services
             return await db.Tasks.ToArrayAsync();
         }
 
-        public async Task CreateAsync(CreateTaskModel createTaskModel)
+        public async Task<BoardTask[]> GetBoardTasksAsync(TaskSearchModel taskSearchModel)
+        {
+            var tasks = db.Tasks.AsNoTracking();
+
+            if (!string.IsNullOrEmpty(taskSearchModel.AssignedTo))
+            {
+                tasks = tasks.Where(x => x.AssignedTo == taskSearchModel.AssignedTo);
+            }
+
+            if (!string.IsNullOrEmpty(taskSearchModel.Title))
+            {
+                tasks = tasks.Where(x => x.Title.Contains(taskSearchModel.Title));
+            }
+
+            if (taskSearchModel.DeadLine.HasValue)
+            {
+                tasks = tasks.Where(x => x.DeadLine < DateTime.Now);
+            }
+
+            tasks = tasks.Where(x => x.Status == taskSearchModel.Status);
+            tasks = tasks.Where(x => x.Type == taskSearchModel.Type);
+
+            return await tasks.ToArrayAsync();
+        }
+
+        public async Task CreateTaskAsync(CreateTaskModel createTaskModel)
         {
             var task = new BoardTask
             {
@@ -44,9 +85,23 @@ namespace TaskBoard.Services
             await db.SaveChangesAsync();
         }
 
-        public async Task RemoveTaskAsync(BoardTask task)
+        public async Task EditTaskAsync(EditTaskModel editTaskModel)
         {
-            db.Tasks.Remove(await db.Tasks.FindAsync(task.TaskId));
+            var task = await db.Tasks.FindAsync(editTaskModel.TaskId);
+
+            task.AssignedTo = editTaskModel.AssignedTo;
+            task.Title = editTaskModel.Title;
+            task.Type = editTaskModel.Type;
+            task.Status = editTaskModel.Status;
+            task.Description = editTaskModel.Description;
+            task.DeadLine = editTaskModel.DeadLine;
+
+            await db.SaveChangesAsync();
+        }
+
+        public async Task RemoveTaskAsync(int taskId)
+        {
+            db.Tasks.Remove(await db.Tasks.FindAsync(taskId));
             await db.SaveChangesAsync();
         }
     }
