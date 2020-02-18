@@ -1,7 +1,7 @@
 ﻿@page "/task-details/{TaskId:int}"
 
-@using Models
 @using Services
+@using ViewModels
 
 @inject TasksService TasksService
 
@@ -11,12 +11,35 @@
 }
 else
 {
-    <div class="card">
-        <div class="card-header">@task.Title</div>
-        <div class="card-body">
-            <h5 class="card-title">@task.Status</h5>
-            <p class="card-text">@task.Description</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+    <div class="col-6">
+        <div class="card">
+            <div class="card-header">@task.Type</div>
+            <div class="card-body">
+                <h5 class="card-title">@task.Title</h5>
+                <p class="card-text">@task.Description</p>
+
+                <!--<EditForm OnValidSubmit="async() => await AddDependentTaskAsync()">-->
+                <form>
+                    <!--<DataAnnotationsValidator />
+    <ValidationSummary />-->
+
+
+                    <div class="form-group">
+                        <label for="dependentTaskId">Dependent task id:</label>
+                        <input id="dependentTaskId" type="number" class="form-control" @bind="dependentTaskId" />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" @onclick="async() => await AddDependentTaskAsync()">Add</button>
+                </form>
+                <!--</EditForm>-->
+
+                <div class="list-group">
+                    @foreach (var dependentTask in task.DependentTasks)
+                    {
+                        <a class="list-group-item list-group-item-action" href="task-details/@dependentTask.TaskId">#@dependentTask.TaskId @dependentTask.Title</a>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 }
@@ -25,10 +48,18 @@ else
     [Parameter]
     public int TaskId { get; set; }
 
-    private BoardTask task { get; set; }
+    private TaskDetailsModel task { get; set; }
+    private int dependentTaskId { get; set; }
 
     protected async override Task OnParametersSetAsync()
     {
         task = await TasksService.GetTaskAsync(TaskId);
+    }
+
+    private async Task AddDependentTaskAsync()
+    {
+        await TasksService.AddDependentTaskAsync(TaskId, Convert.ToInt32(dependentTaskId));
+
+        await OnParametersSetAsync();
     }
 }

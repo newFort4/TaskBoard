@@ -27,7 +27,7 @@ namespace TaskBoard.Services
             return new EditTaskModel
             {
                 TaskId = task.TaskId,
-                AssignedTo = task.AssignedTo?.Email,
+                AssignedTo = task.AssignedTo,
                 Title = task.Title,
                 Type = task.Type,
                 Status = task.Status,
@@ -36,9 +36,24 @@ namespace TaskBoard.Services
             };
         }
 
-        public async Task<BoardTask> GetTaskAsync(int taskId)
+        public async Task<TaskDetailsModel> GetTaskAsync(int taskId)
         {
-            return await db.Tasks.FindAsync(taskId);
+            var boardTask = await db.Tasks.FindAsync(taskId);
+
+            var dependentTasks = await db
+                .DependentTasks
+                .Include(x => x.MainTask)
+                .Include(x => x.SubTask)
+                .Where(x => x.SubTask.TaskId == boardTask.TaskId)
+                .Select(x => x.MainTask)
+                .ToListAsync();
+
+            var taskDetailsModels = TaskDetailsModel.ToControllerModel(boardTask);
+            taskDetailsModels.DependentTasks = dependentTasks
+                .Select(x => TaskDetailsModel.ToControllerModel(x))
+                .ToList();
+
+            return taskDetailsModels;
         }
 
         public IQueryable<BoardTask> GetBoardTasks()
@@ -52,6 +67,8 @@ namespace TaskBoard.Services
         public async Task<BoardTask[]> GetBoardTasksAsync()
         {
             return await GetBoardTasks()
+                .OrderBy(x => x.TaskId)
+                .Take(20)
                 .ToArrayAsync();
         }
 
@@ -84,7 +101,10 @@ namespace TaskBoard.Services
             tasks = tasks.Where(x => x.Status == taskSearchModel.Status);
             tasks = tasks.Where(x => x.Type == taskSearchModel.Type);
 
-            return await tasks.ToArrayAsync();
+            return await tasks
+                .OrderBy(x => x.TaskId)
+                .Take(20)
+                .ToArrayAsync();
         }
 
         public async Task CreateTaskAsync(CreateTaskModel createTaskModel)
@@ -127,6 +147,27 @@ namespace TaskBoard.Services
         public async Task RemoveTaskAsync(int taskId)
         {
             db.Tasks.Remove(await db.Tasks.FindAsync(taskId));
+            await db.SaveChangesAsync();
+        }
+
+        public async Task AddDependentTaskAsync(int taskId, int dependentTaskId)
+        {
+            var subTask = await db.Tasks.FindAsync(taskId);
+            var mainTask = await db.Tasks.FindAsync(dependentTaskId);
+
+            if (subTask == null || mainTask == null)
+            {
+                throw new Exception("Task with provided id doesn't exist.");
+            }
+
+            var dependentTask = new DependentTask
+            {
+                MainTask = mainTask,
+                SubTask = subTask,
+                Relation = Relation.Required
+            };
+
+            await db.DependentTasks.AddAsync(dependentTask);
             await db.SaveChangesAsync();
         }
     }

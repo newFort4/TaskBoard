@@ -18,39 +18,46 @@ else
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <InputText id="title" class="form-control" @bind-Value="editTaskModel.Title" />
-            </div>
-            <div class="form-group">
-                <label for="type">Type:</label>
-                <InputSelect @bind-Value="editTaskModel.Type">
-                    <option value="@TaskType.Bug">Bug</option>
-                    <option value="@TaskType.Feature">Feature</option>
-                </InputSelect>
-            </div>
-            <div class="form-group">
-                <label for="status">Status:</label>
-                <InputSelect @bind-Value="editTaskModel.Status">
-                    <option value="@Status.New">New</option>
-                    <option value="@Status.InProgress">In progress</option>
-                    <option value="@Status.Completed">Completed</option>
-                </InputSelect>
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <InputTextArea id="description" class="form-control" @bind-Value="editTaskModel.Description" />
-            </div>
-            <div class="form-group">
-                <label for="assignedTo">Assigned to:</label>
-                <InputText id="assignedTo" class="form-control" @bind-Value="editTaskModel.AssignedTo" />
-            </div>
-            <div class="form-group">
-                <label for="deadLine">DeadLine:</label>
-                <input id="deadLine" class="form-control" @bind="editTaskModel.DeadLine" placeholder="MM/dd/yyyy" @bind:format="MM/dd/yyyy" />
-            </div>
 
-            <button type="submit" class="btn btn-primary">Edit</button>
+            <div class="card">
+                <div class="card-header">@editTaskModel.Title</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <InputText id="title" class="form-control" @bind-Value="editTaskModel.Title" />
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type:</label>
+                        <InputSelect @bind-Value="editTaskModel.Type">
+                            <option value="@TaskType.Bug">Bug</option>
+                            <option value="@TaskType.Feature">Feature</option>
+                        </InputSelect>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <InputSelect @bind-Value="editTaskModel.Status">
+                            <option value="@Status.New">New</option>
+                            <option value="@Status.InProgress">In progress</option>
+                            <option value="@Status.Completed">Completed</option>
+                        </InputSelect>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <InputTextArea id="description" class="form-control" @bind-Value="editTaskModel.Description" />
+                    </div>
+                    <div class="form-group">
+                        <label for="assignedTo">Assigned to:</label>
+                        <InputText id="assignedTo" class="form-control" @bind-Value="editTaskModel.AssignedTo" />
+                    </div>
+                    <div class="form-group">
+                        <label for="deadLine">DeadLine:</label>
+                        <input id="deadLine" class="form-control" @bind="editTaskModel.DeadLine" placeholder="MM/dd/yyyy" @bind:format="MM/dd/yyyy" />
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Edit</button>
+                </div>
+            </div>
         </EditForm>
     </div>
 }
