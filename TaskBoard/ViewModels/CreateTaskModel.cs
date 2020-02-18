@@ -13,7 +13,6 @@ namespace TaskBoard.ViewModels
         [StringLength(256)]
         public string Description { get; set; }
 
-        [Required]
         public string AssignedTo { get; set; }
 
         public TaskType Type { get; set; }

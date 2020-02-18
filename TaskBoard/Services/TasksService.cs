@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskBoard.Enums;
 using TaskBoard.Models;
@@ -11,10 +12,12 @@ namespace TaskBoard.Services
     public class TasksService
     {
         readonly TaskBoardDbContext db;
+        readonly UserManager<IdentityUser> userManager;
 
-        public TasksService(TaskBoardDbContext db)
+        public TasksService(TaskBoardDbContext db, UserManager<IdentityUser> userManager)
         {
             this.db = db;
+            this.userManager = userManager;
         }
 
         public async Task<EditTaskModel> GetTaskForEditAsync(int taskId)
@@ -24,7 +27,7 @@ namespace TaskBoard.Services
             return new EditTaskModel
             {
                 TaskId = task.TaskId,
-                AssignedTo = task.AssignedTo,
+                AssignedTo = task.AssignedTo?.Email,
                 Title = task.Title,
                 Type = task.Type,
                 Status = task.Status,
@@ -38,18 +41,34 @@ namespace TaskBoard.Services
             return await db.Tasks.FindAsync(taskId);
         }
 
+        public IQueryable<BoardTask> GetBoardTasks()
+        {
+            return db
+                .Tasks
+                .Include(x => x.AssignedTo)
+                .AsNoTracking();
+        }
+
         public async Task<BoardTask[]> GetBoardTasksAsync()
         {
-            return await db.Tasks.ToArrayAsync();
+            return await GetBoardTasks()
+                .ToArrayAsync();
         }
 
         public async Task<BoardTask[]> GetBoardTasksAsync(TaskSearchModel taskSearchModel)
         {
-            var tasks = db.Tasks.AsNoTracking();
+            var tasks = GetBoardTasks();
 
             if (!string.IsNullOrEmpty(taskSearchModel.AssignedTo))
             {
-                tasks = tasks.Where(x => x.AssignedTo == taskSearchModel.AssignedTo);
+                if (taskSearchModel.AssignedTo == "/Unassigned")
+                {
+                    tasks = tasks.Where(x => x.AssignedTo == null);
+                }
+                else
+                {
+                    tasks = tasks.Where(x => x.AssignedTo.Email.Contains(taskSearchModel.AssignedTo));
+                }
             }
 
             if (!string.IsNullOrEmpty(taskSearchModel.Title))
@@ -70,11 +89,15 @@ namespace TaskBoard.Services
 
         public async Task CreateTaskAsync(CreateTaskModel createTaskModel)
         {
+            var identityUser = !string.IsNullOrEmpty(createTaskModel.AssignedTo) ?
+                await userManager.FindByEmailAsync(createTaskModel.AssignedTo) :
+                null;
+
             var task = new BoardTask
             {
                 Title = createTaskModel.Title,
                 Description = createTaskModel.Description,
-                AssignedTo = createTaskModel.AssignedTo,
+                AssignedTo = identityUser,
                 Status = Status.New,
                 Type = createTaskModel.Type,
                 Created = DateTime.Now,
@@ -89,7 +112,9 @@ namespace TaskBoard.Services
         {
             var task = await db.Tasks.FindAsync(editTaskModel.TaskId);
 
-            task.AssignedTo = editTaskModel.AssignedTo;
+            var identityUser = await db.Users.SingleOrDefaultAsync(x => x.Email == editTaskModel.AssignedTo);
+
+            task.AssignedTo = identityUser;
             task.Title = editTaskModel.Title;
             task.Type = editTaskModel.Type;
             task.Status = editTaskModel.Status;

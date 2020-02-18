@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 using TaskBoard.Enums;
 
 namespace TaskBoard.Models
@@ -8,7 +9,7 @@ namespace TaskBoard.Models
     {
         [Key]
         public int TaskId { get; set; }
-        public string AssignedTo { get; set; }
+        public IdentityUser AssignedTo { get; set; }
         public string Title { get; set; }
         public TaskType Type { get; set; }
         public Status Status { get; set; }

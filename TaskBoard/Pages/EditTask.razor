@@ -47,7 +47,7 @@ else
             </div>
             <div class="form-group">
                 <label for="deadLine">DeadLine:</label>
-                <input id="deadLine" class="form-control" @bind="editTaskModel.DeadLine" @bind:format="MM/dd/yyyy" />
+                <input id="deadLine" class="form-control" @bind="editTaskModel.DeadLine" placeholder="MM/dd/yyyy" @bind:format="MM/dd/yyyy" />
             </div>
 
             <button type="submit" class="btn btn-primary">Edit</button>
