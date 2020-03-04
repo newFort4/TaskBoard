@@ -64,47 +64,42 @@ namespace TaskBoard.Services
                 .AsNoTracking();
         }
 
-        public async Task<BoardTask[]> GetBoardTasksAsync()
-        {
-            return await GetBoardTasks()
-                .OrderBy(x => x.TaskId)
-                .Take(20)
-                .ToArrayAsync();
-        }
-
-        public async Task<BoardTask[]> GetBoardTasksAsync(TaskSearchModel taskSearchModel)
+        public async Task<BaseResultsModel<BoardTask>> GetBoardTasksAsync(TaskSearchModel taskSearchModel = null)
         {
             var tasks = GetBoardTasks();
 
-            if (!string.IsNullOrEmpty(taskSearchModel.AssignedTo))
+            if (taskSearchModel != null)
             {
-                if (taskSearchModel.AssignedTo == "/Unassigned")
+                if (!string.IsNullOrEmpty(taskSearchModel.AssignedTo))
                 {
-                    tasks = tasks.Where(x => x.AssignedTo == null);
+                    if (taskSearchModel.AssignedTo == "/Unassigned")
+                    {
+                        tasks = tasks.Where(x => x.AssignedTo == null);
+                    }
+                    else
+                    {
+                        tasks = tasks.Where(x => x.AssignedTo.Email.Contains(taskSearchModel.AssignedTo));
+                    }
                 }
-                else
+
+                if (!string.IsNullOrEmpty(taskSearchModel.Title))
                 {
-                    tasks = tasks.Where(x => x.AssignedTo.Email.Contains(taskSearchModel.AssignedTo));
+                    tasks = tasks.Where(x => x.Title.Contains(taskSearchModel.Title));
                 }
+
+                if (taskSearchModel.DeadLine.HasValue)
+                {
+                    tasks = tasks.Where(x => x.DeadLine < DateTime.Now);
+                }
+
+                tasks = tasks.Where(x => x.Status == taskSearchModel.Status);
+                tasks = tasks.Where(x => x.Type == taskSearchModel.Type);
             }
 
-            if (!string.IsNullOrEmpty(taskSearchModel.Title))
-            {
-                tasks = tasks.Where(x => x.Title.Contains(taskSearchModel.Title));
-            }
-
-            if (taskSearchModel.DeadLine.HasValue)
-            {
-                tasks = tasks.Where(x => x.DeadLine < DateTime.Now);
-            }
-
-            tasks = tasks.Where(x => x.Status == taskSearchModel.Status);
-            tasks = tasks.Where(x => x.Type == taskSearchModel.Type);
-
-            return await tasks
+            return new BaseResultsModel<BoardTask>(await tasks.CountAsync(), await tasks
                 .OrderBy(x => x.TaskId)
                 .Take(20)
-                .ToArrayAsync();
+                .ToListAsync());
         }
 
         public async Task CreateTaskAsync(CreateTaskModel createTaskModel)

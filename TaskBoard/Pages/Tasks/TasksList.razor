@@ -64,7 +64,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var task in tasks)
+            @foreach (var task in tasks.Results)
             {
                 <tr class="@(task.DeadLine.HasValue && task.DeadLine < DateTime.Now ? "bg-danger text-white" : "")">
                     <td><a href="/task-details/@task.TaskId">@task.TaskId</a></td>
@@ -95,27 +95,31 @@
             }
         </tbody>
     </table>
+    @taskSearchModel.CurrentPage
+    <Paginator
+               Count="@tasks.AllResultsCount"
+               SearchModel="@taskSearchModel">
+    </Paginator>
 }
 
 @code {
     private TaskSearchModel taskSearchModel = new TaskSearchModel();
-    private BoardTask[] tasks;
+    private BaseResultsModel<BoardTask> tasks;
 
     protected override async Task OnInitializedAsync()
     {
-        taskSearchModel = new TaskSearchModel();
         tasks = await TasksService.GetBoardTasksAsync();
     }
 
     protected async Task SearchTasksAsync()
     {
-        tasks = await TasksService.GetBoardTasksAsync(taskSearchModel);
+        tasks = await (taskSearchModel);
     }
 
     async Task Remove(BoardTask task)
     {
         await TasksService.RemoveTaskAsync(task.TaskId);
 
-        tasks = tasks.Where(x => x != task).ToArray();
+        tasks.Results.Remove(task);
     }
 }

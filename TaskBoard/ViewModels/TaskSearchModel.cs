@@ -3,7 +3,7 @@ using TaskBoard.Enums;
 
 namespace TaskBoard.ViewModels
 {
-    public class TaskSearchModel
+    public class TaskSearchModel : SearchModel
     {
         public string AssignedTo { get; set; }
         public DateTime? Created { get; set; }
