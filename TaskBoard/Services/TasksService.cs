@@ -98,7 +98,8 @@ namespace TaskBoard.Services
 
             return new BaseResultsModel<BoardTask>(await tasks.CountAsync(), await tasks
                 .OrderBy(x => x.TaskId)
-                .Take(20)
+                .Skip(taskSearchModel.PageSize * (taskSearchModel.CurrentPage - 1))
+                .Take(taskSearchModel.PageSize)
                 .ToListAsync());
         }
 

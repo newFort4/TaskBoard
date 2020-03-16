@@ -95,10 +95,10 @@
             }
         </tbody>
     </table>
-    @taskSearchModel.CurrentPage
     <Paginator
                Count="@tasks.AllResultsCount"
-               SearchModel="@taskSearchModel">
+               SearchModel="@taskSearchModel"
+               Callback="async () => await SearchTasksAsync()">
     </Paginator>
 }
 
@@ -108,12 +108,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        tasks = await TasksService.GetBoardTasksAsync();
+        await SearchTasksAsync();
     }
 
     protected async Task SearchTasksAsync()
     {
-        tasks = await (taskSearchModel);
+        tasks = null;
+        tasks = await TasksService.GetBoardTasksAsync(taskSearchModel);
     }
 
     async Task Remove(BoardTask task)

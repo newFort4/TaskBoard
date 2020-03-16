@@ -28,6 +28,9 @@
     [Parameter]
     public SearchModel SearchModel { get; set; }
 
+    [Parameter]
+    public EventCallback Callback { get; set; }
+
     private List<int> pageNumbers
     {
         get
@@ -50,8 +53,10 @@
         }
     }
 
-    private void ChangePageNumber(int pageNumber)
+    private async void ChangePageNumber(int pageNumber)
     {
         SearchModel.CurrentPage = pageNumber;
+
+        await Callback.InvokeAsync(null);
     }
 }
