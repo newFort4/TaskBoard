@@ -1,4 +1,5 @@
-﻿@page "/tasks-list"
+﻿@attribute [Authorize]
+@page "/tasks-list"
 
 @using Enums
 @using Services
@@ -12,7 +13,8 @@
 @if (tasks == null)
 {
     <p><em>Loading...</em></p>
-} else
+}
+else
 {
     <div>
         <EditForm class="form row" Model="@taskSearchModel" OnValidSubmit="async() => await SearchTasksAsync()">
@@ -88,19 +90,22 @@
                     <td>@task.Created.ToShortDateString()</td>
                     <td>@task.DeadLine?.ToShortDateString()</td>
                     <td>
-                        <a class="btn btn-primary" href="edit-task/@task.TaskId">
-                            <span class="oi oi-pencil"></span>
-                        </a>
-                        <button class="btn btn-danger" @onclick="async() => await Remove(task)">
-                            <span class="oi oi-trash"></span>
-                        </button>
+                        <AuthorizeView Roles="TaskEditors">
+                            <a class="btn btn-primary" href="edit-task/@task.TaskId">
+                                <span class="oi oi-pencil"></span>
+                            </a>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="TaskDeletors">
+                            <button class="btn btn-danger" @onclick="async() => await Remove(task)">
+                                <span class="oi oi-trash"></span>
+                            </button>
+                        </AuthorizeView>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    <Paginator
-               Count="@tasks.AllResultsCount"
+    <Paginator Count="@tasks.AllResultsCount"
                SearchModel="@taskSearchModel"
                Callback="async () => await SearchTasksAsync()">
     </Paginator>

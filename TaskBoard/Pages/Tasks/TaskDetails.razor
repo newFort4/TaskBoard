@@ -1,4 +1,5 @@
-﻿@page "/task-details/{TaskId:int}"
+﻿@attribute [Authorize]
+@page "/task-details/{TaskId:int}"
 
 @using Services
 @using ViewModels
@@ -22,7 +23,7 @@ else
                 <!--<EditForm OnValidSubmit="async() => await AddDependentTaskAsync()">-->
                 <form>
                     <!--<DataAnnotationsValidator />
-        <ValidationSummary />-->
+                    <ValidationSummary />-->
 
 
                     <div class="form-group">
