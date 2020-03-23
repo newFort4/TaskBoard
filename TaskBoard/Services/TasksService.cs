@@ -31,6 +31,7 @@ namespace TaskBoard.Services
                 Title = task.Title,
                 Type = task.Type,
                 Status = task.Status,
+                Progress = task.Progress,
                 Description = task.Description,
                 DeadLine = task.DeadLine
             };
@@ -92,8 +93,15 @@ namespace TaskBoard.Services
                     tasks = tasks.Where(x => x.DeadLine < DateTime.Now);
                 }
 
-                tasks = tasks.Where(x => x.Status == taskSearchModel.Status);
-                tasks = tasks.Where(x => x.Type == taskSearchModel.Type);
+                if (taskSearchModel.Status != null)
+                {
+                    tasks = tasks.Where(x => x.Status == taskSearchModel.Status);
+                }
+
+                if (taskSearchModel.Type != null)
+                {
+                    tasks = tasks.Where(x => x.Type == taskSearchModel.Type);
+                }
             }
 
             return new BaseResultsModel<BoardTask>(await tasks.CountAsync(), await tasks
@@ -134,6 +142,7 @@ namespace TaskBoard.Services
             task.Title = editTaskModel.Title;
             task.Type = editTaskModel.Type;
             task.Status = editTaskModel.Status;
+            task.Progress = editTaskModel.Progress;
             task.Description = editTaskModel.Description;
             task.DeadLine = editTaskModel.DeadLine;
 

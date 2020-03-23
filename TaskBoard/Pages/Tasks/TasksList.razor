@@ -24,6 +24,7 @@
             </div>
             <div class="form-group col-2">
                 <InputSelect class="custom-select" @bind-Value="taskSearchModel.Status" placeholder="Status">
+                    <option value="@((Status?)null)">All</option>
                     <option value="@Status.New">New</option>
                     <option value="@Status.InProgress">In progress</option>
                     <option value="@Status.Completed">Completed</option>
@@ -31,6 +32,7 @@
             </div>
             <div class="form-group col-2">
                 <InputSelect class="custom-select" @bind-Value="taskSearchModel.Type" placeholder="Type">
+                    <option value="@((TaskType?) null)">All</option>
                     <option value="@TaskType.Bug">Bug</option>
                     <option value="@TaskType.Feature">Feature</option>
                 </InputSelect>
@@ -58,6 +60,7 @@
                 <th>Title</th>
                 <th>AssignedTo</th>
                 <th>Status</th>
+                <th>Progress</th>
                 <th>Created</th>
                 <th>DeadLine</th>
                 <th>Command</th>
@@ -81,6 +84,7 @@
                         }
                     </td>
                     <td>@task.Status</td>
+                    <td><progress value="@task.Progress" max="100" /> @task.Progress %</td>
                     <td>@task.Created.ToShortDateString()</td>
                     <td>@task.DeadLine?.ToShortDateString()</td>
                     <td>

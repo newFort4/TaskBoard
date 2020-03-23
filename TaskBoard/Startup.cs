@@ -28,7 +28,8 @@ namespace TaskBoard
             services.AddDbContext<TaskBoardDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("TaskBoardDbContext")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<TaskBoardDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();

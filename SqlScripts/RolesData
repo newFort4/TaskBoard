@@ -1,0 +1,6 @@
+insert into AspNetRoles values('TaskCreators', 'TaskCreators', 'TASKCREATORS', null); --Task creators
+insert into AspNetRoles values('TaskReaders', 'TaskReaders', 'TASKREADERS', null); --Task readers
+insert into AspNetRoles values('TaskEditors', 'TaskEditors', 'TASKEDITORS', null); --Task editors
+insert into AspNetRoles values('TaskDeletors', 'TaskDeletors', 'TASKDELETORS', null); --Task deletors
+
+insert into AspNetRoles values('Administrators', 'Administrators', 'ADMINISTRATORS', null); --Administrators

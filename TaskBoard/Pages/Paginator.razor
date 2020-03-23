@@ -2,22 +2,28 @@
 
 <nav aria-label="Page navigation example">
     <ul class="pagination">
-        <li class="page-item">
-            <button class="page-link" @onclick="() => ChangePageNumber(SearchModel.CurrentPage - 1)" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </button>
-        </li>
+        @if (canGoPrev)
+        {
+            <li class="page-item">
+                <button class="page-link" @onclick="() => ChangePageNumber(SearchModel.CurrentPage - 1)" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </button>
+            </li>
+        }
 
         @foreach (var pageNumber in pageNumbers)
         {
             <li class="page-item @(SearchModel.CurrentPage == pageNumber ? "active" : "")"><button @onclick="() => ChangePageNumber(pageNumber)" class="page-link">@(pageNumber)</button></li>
         }
 
-    <li class="page-item">
-        <button class="page-link" @onclick="() => ChangePageNumber(SearchModel.CurrentPage + 1)" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-        </button>
-    </li>
+        @if (canGoNext)
+        {
+            <li class="page-item">
+                <button class="page-link" @onclick="() => ChangePageNumber(SearchModel.CurrentPage + 1)" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </button>
+            </li>
+        }
     </ul>
 </nav>
 
@@ -31,20 +37,36 @@
     [Parameter]
     public EventCallback Callback { get; set; }
 
+    private bool canGoPrev
+    {
+        get
+        {
+            return SearchModel.CurrentPage != 1;
+        }
+    }
+
+    private bool canGoNext
+    {
+        get
+        {
+            return SearchModel.CurrentPage * SearchModel.PageSize < Count;
+        }
+    }
+
     private List<int> pageNumbers
     {
         get
         {
             var pageNumbers = new List<int>();
 
-            if (SearchModel.CurrentPage != 1)
+            if (canGoPrev)
             {
                 pageNumbers.Add(SearchModel.CurrentPage - 1);
             }
 
             pageNumbers.Add(SearchModel.CurrentPage);
 
-            if (SearchModel.CurrentPage * SearchModel.PageSize < Count)
+            if (canGoNext)
             {
                 pageNumbers.Add(SearchModel.CurrentPage + 1);
             }

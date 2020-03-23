@@ -16,12 +16,13 @@ else
             <div class="card-header">@task.Type</div>
             <div class="card-body">
                 <h5 class="card-title">@task.Title</h5>
+                <p><progress value="@task.Progress" max="100" /> @task.Progress %</p>
                 <p class="card-text">@task.Description</p>
 
                 <!--<EditForm OnValidSubmit="async() => await AddDependentTaskAsync()">-->
                 <form>
                     <!--<DataAnnotationsValidator />
-    <ValidationSummary />-->
+        <ValidationSummary />-->
 
 
                     <div class="form-group">
