@@ -165,6 +165,24 @@ namespace TaskBoard.Services
                 throw new Exception("Task with provided id doesn't exist.");
             }
 
+            if (await db
+                .DependentTasks
+                .Include(x => x.MainTask)
+                .Include(x => x.SubTask)
+                .AnyAsync(x => x.MainTask.TaskId == dependentTaskId && x.SubTask.TaskId == taskId))
+            {
+                throw new Exception("This relation is already exist");
+            }
+
+            if (await db
+                .DependentTasks
+                .Include(x => x.MainTask)
+                .Include(x => x.SubTask)
+                .AnyAsync(x => x.MainTask.TaskId == taskId && x.SubTask.TaskId == dependentTaskId))
+            {
+                throw new Exception("Cycle relation is not permited.");
+            }
+
             var dependentTask = new DependentTask
             {
                 MainTask = mainTask,

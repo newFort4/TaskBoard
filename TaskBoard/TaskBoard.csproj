@@ -19,5 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Pages\Tasks\" />
+    <Folder Include="Pages\UserRoleManager\" />
   </ItemGroup>
 </Project>

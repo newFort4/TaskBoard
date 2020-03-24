@@ -51,9 +51,11 @@ else
             </div>
         </EditForm>
     </div>
-    <div>
-        <a class="btn btn-primary" href="create-task">Create new task</a>
-    </div>
+    <AuthorizeView Roles="TaskCreators">
+        <div>
+            <a class="btn btn-primary" href="create-task">Create new task</a>
+        </div>
+    </AuthorizeView>
     <br />
     <table class="table table-hover">
         <thead>

@@ -1,0 +1,93 @@
+﻿@attribute [Authorize(Roles = "Administrators")]
+@page "/user-role-manager"
+
+@using Areas.Identity
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore;
+@using Models;
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject RoleManager<IdentityRole> RoleManager
+@inject TaskBoardDbContext TaskBoardDbContext
+@inject UserManager<IdentityUser> UserManager
+
+<h1>User Role Manager</h1>
+
+@if (identityUsers == null || identityRoles == null || identityUserRoles == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>User</th>
+                @foreach (var identityRole in identityRoles)
+                {
+                    <th>@identityRole.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var identityUser in identityUsers)
+            {
+                <tr>
+                    <td>@identityUser.UserName</td>
+                    @foreach (var identityRole in identityRoles)
+                    {
+                <td>
+                    @if (identityUserRoles.Exists(x => x.UserId == identityUser.Id && x.RoleId == identityRole.Id))
+                    {
+                        <button class="btn btn-info" @onclick="async () => await RemoveFromRole(identityUser, identityRole)">Revoke</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-info" @onclick="async () => await AddToRole(identityUser, identityRole)">Grant</button>
+                    }
+                </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<IdentityUser> identityUsers { get; set; }
+    private List<IdentityRole> identityRoles { get; set; }
+    private List<IdentityUserRole<string>> identityUserRoles { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        identityUsers = await UserManager.Users.ToListAsync();
+        identityRoles = await RoleManager.Roles.ToListAsync();
+        identityUserRoles = await TaskBoardDbContext.UserRoles.ToListAsync();
+    }
+
+    private async Task AddToRole(IdentityUser identityUser, IdentityRole identityRole)
+    {
+        if (!await UserManager.IsInRoleAsync(identityUser, identityRole.Name))
+        {
+            await UserManager.AddToRoleAsync(identityUser, identityRole.Name);
+
+            await OnIdentityUserRolesChanged();
+        }
+    }
+
+    private async Task RemoveFromRole(IdentityUser identityUser, IdentityRole identityRole)
+    {
+        if (await UserManager.IsInRoleAsync(identityUser, identityRole.Name))
+        {
+            await UserManager.RemoveFromRoleAsync(identityUser, identityRole.Name);
+
+            await OnIdentityUserRolesChanged();
+        }
+    }
+
+    private async Task OnIdentityUserRolesChanged()
+    {
+        identityUserRoles = null;
+        identityUserRoles = await TaskBoardDbContext.UserRoles.ToListAsync();
+    }
+}
