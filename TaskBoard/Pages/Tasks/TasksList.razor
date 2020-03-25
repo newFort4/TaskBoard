@@ -25,16 +25,26 @@ else
                 <InputText id="title" class="form-control" @bind-Value="taskSearchModel.Title" placeholder="Title" />
             </div>
             <div class="form-group col-2">
+                <label for="allStatuses">
+                    <InputCheckbox id="allStatuses" class="form-control" @bind-Value="taskSearchModel.AllStatuses" placeholder="Title" />
+                    All statuses?
+                </label>
+            </div>
+            <div class="form-group col-2">
                 <InputSelect class="custom-select" @bind-Value="taskSearchModel.Status" placeholder="Status">
-                    <option value="@((Status?)null)">All</option>
                     <option value="@Status.New">New</option>
                     <option value="@Status.InProgress">In progress</option>
                     <option value="@Status.Completed">Completed</option>
                 </InputSelect>
             </div>
             <div class="form-group col-2">
+                <label for="allTypes">
+                    <InputCheckbox id="allTypes" class="form-control" @bind-Value="taskSearchModel.AllTypes" />
+                    All types?
+                </label>
+            </div>
+            <div class="form-group col-2">
                 <InputSelect class="custom-select" @bind-Value="taskSearchModel.Type" placeholder="Type">
-                    <option value="@((TaskType?) null)">All</option>
                     <option value="@TaskType.Bug">Bug</option>
                     <option value="@TaskType.Feature">Feature</option>
                 </InputSelect>

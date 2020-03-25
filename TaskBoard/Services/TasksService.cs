@@ -93,12 +93,12 @@ namespace TaskBoard.Services
                     tasks = tasks.Where(x => x.DeadLine < DateTime.Now);
                 }
 
-                if (taskSearchModel.Status != null)
+                if (!taskSearchModel.AllStatuses)
                 {
                     tasks = tasks.Where(x => x.Status == taskSearchModel.Status);
                 }
 
-                if (taskSearchModel.Type != null)
+                if (!taskSearchModel.AllTypes)
                 {
                     tasks = tasks.Where(x => x.Type == taskSearchModel.Type);
                 }

@@ -35,6 +35,8 @@ namespace TaskBoard
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddScoped<TasksService>();
+
+            services.AddAuthenticationCore();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
