@@ -1,0 +1,19 @@
+declare @startDate date = '2020-01-01';
+declare @endDate date = '2021-01-01';
+
+declare @typesCount int = 2;
+declare @statusesCount int = 3;
+
+declare @i int = 0;
+
+while @i < 1000
+begin
+    insert into Releases
+     values (
+      concat('Release', cast(@i as varchar(max))),
+      concat('Descr', cast(@i as varchar(max))),
+      null,
+      dateAdd(Day, Rand() * DateDiff(Day, @startDate, @endDate), @startDate))
+
+    set @i = @i + 1;
+end;
