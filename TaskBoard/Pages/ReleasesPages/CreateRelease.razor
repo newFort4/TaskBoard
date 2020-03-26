@@ -1,0 +1,52 @@
+@attribute [Authorize(Roles = "ReleaseCreators")]
+@page "/create-release"
+
+@using Services
+@using ViewModels.Releases
+
+@inject NavigationManager NavigationManager
+@inject ReleasesService ReleasesService
+
+<div class="col-6">
+    <EditForm Model="@createReleaseModel" OnValidSubmit="async() => await HandleValidSubmit()">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="card">
+            <div class="card-header">@createReleaseModel.Title</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <InputText id="title" class="form-control" @bind-Value="createReleaseModel.Title" />
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <InputTextArea id="description" class="form-control" @bind-Value="createReleaseModel.Description" />
+                </div>
+                <div class="form-group">
+                    <label for="assignedTo">Assigned to:</label>
+                    <InputText id="assignedTo" class="form-control" @bind-Value="createReleaseModel.AssignedTo" />
+                </div>
+                <div class="form-group">
+                    <label for="deadLine">Release Date:</label>
+                    <input id="deadLine" class="form-control" @bind="createReleaseModel.ReleaseDate" @bind:format="MM/dd/yyyy" />
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    private CreateReleaseModel createReleaseModel = new CreateReleaseModel();
+
+    private async Task HandleValidSubmit()
+    {
+        await ReleasesService.CreateReleaseAsync(createReleaseModel);
+
+        NavigationManager.NavigateTo("releases-list");
+    }
+}

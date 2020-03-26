@@ -18,12 +18,4 @@
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Analyzers" Version="0.7.0" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.4.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\Tasks\" />
-    <Folder Include="Pages\Releases\" />
-    <Folder Include="Pages\UserRoleManager\" />
-    <Folder Include="ViewModels\Tasks\" />
-    <Folder Include="ViewModels\Releases\" />
-  </ItemGroup>
 </Project>

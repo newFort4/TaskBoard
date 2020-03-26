@@ -1,0 +1,67 @@
+@attribute [Authorize(Roles = "ReleaseEditors")]
+@page "/edit-release/{ReleaseId:int}"
+
+@using Services
+@using ViewModels.Releases
+
+@inject NavigationManager NavigationManager
+@inject ReleasesService ReleasesService
+
+@if (editReleaseModel == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="col-6">
+        <EditForm Model="@editReleaseModel" OnValidSubmit="async() => await HandleValidSubmit()">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+
+            <div class="card">
+                <div class="card-header">@editReleaseModel.Title</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="title">Title:</label>
+                        <InputText id="title" class="form-control" @bind-Value="editReleaseModel.Title" />
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description:</label>
+                        <InputTextArea id="description" class="form-control" @bind-Value="editReleaseModel.Description" />
+                    </div>
+                    <div class="form-group">
+                        <label for="assignedTo">Assigned to:</label>
+                        <InputText id="assignedTo" class="form-control" @bind-Value="editReleaseModel.AssignedTo" />
+                    </div>
+                    <div class="form-group">
+                        <label for="deadLine">Release Date:</label>
+                        <input id="deadLine" class="form-control" @bind="editReleaseModel.ReleaseDate" placeholder="MM/dd/yyyy" @bind:format="MM/dd/yyyy" />
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Edit</button>
+                </div>
+            </div>
+        </EditForm>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int ReleaseId { get; set; }
+
+    private EditReleaseModel editReleaseModel { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        editReleaseModel = await ReleasesService.GetReleaseForEditAsync(ReleaseId);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await ReleasesService.EditReleaseAsync(editReleaseModel);
+
+        NavigationManager.NavigateTo("releases-list");
+    }
+}

@@ -1,0 +1,116 @@
+﻿@attribute [Authorize]
+@page "/releases-list"
+
+@using Services
+@using Models
+@using ViewModels
+@using ViewModels.Releases
+
+@inject ReleasesService ReleasesService
+
+<h1>Releases list</h1>
+
+@if (releases == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div>
+        <EditForm class="form row" Model="@releaseSearchModel" OnValidSubmit="async() => await SearchReleasesAsync()">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group col-2">
+                <InputText id="title" class="form-control" @bind-Value="releaseSearchModel.Title" placeholder="Title" />
+            </div>
+            <div class="form-group col-2">
+                <InputText id="assignedTo" class="form-control" @bind-Value="releaseSearchModel.AssignedTo" placeholder="Assigned to" />
+            </div>
+            <div class="form-group col-2">
+                <input id="deadLine" class="form-control" @bind="releaseSearchModel.ReleaseDate" @bind:format="MM/dd/yyyy" />
+            </div>
+
+            <div class="form-group col-2">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </EditForm>
+    </div>
+    <AuthorizeView Roles="ReleaseCreators">
+        <div>
+            <a class="btn btn-primary" href="create-release">Create new release</a>
+        </div>
+    </AuthorizeView>
+    <h4 class="text-right">All releases count: @releases.AllResultsCount</h4>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>AssignedTo</th>
+                <th>ReleaseDate</th>
+                <th>Command</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var release in releases.Results)
+            {
+                <tr class="@(release.ReleaseDate.HasValue && release.ReleaseDate < DateTime.Now ? "bg-danger text-white" : "")">
+                    <td><a href="/release-details/@release.ReleaseId">@release.ReleaseId</a></td>
+                    <td>@release.Title</td>
+                    <td>
+                        <span class="oi oi-person"></span>
+                        @if (release.AssignedTo != null)
+                        {
+                            @release.AssignedTo.Email
+                        }
+                        else
+                        {
+                            @("Unassigned")
+                        }
+                    </td>
+                    <td>@release.ReleaseDate?.ToShortDateString()</td>
+                    <td>
+                        <AuthorizeView Roles="ReleaseEditors">
+                            <a class="btn btn-primary" href="edit-release/@release.ReleaseId">
+                                <span class="oi oi-pencil"></span>
+                            </a>
+                        </AuthorizeView>
+                        <AuthorizeView Roles="ReleaseDeletors">
+                            <button class="btn btn-danger" @onclick="async() => await Remove(release)">
+                                <span class="oi oi-trash"></span>
+                            </button>
+                        </AuthorizeView>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <Paginator Count="@releases.AllResultsCount"
+               SearchModel="@releaseSearchModel"
+               Callback="async () => await SearchReleasesAsync()">
+    </Paginator>
+}
+
+@code {
+    private ReleaseSearchModel releaseSearchModel = new ReleaseSearchModel();
+    private BaseResultsModel<Release> releases;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SearchReleasesAsync();
+    }
+
+    protected async Task SearchReleasesAsync()
+    {
+        releases = null;
+        releases = await ReleasesService.GetReleasesAsync(releaseSearchModel);
+    }
+
+    async Task Remove(Release release)
+    {
+        await ReleasesService.RemoveReleaseAsync(release.ReleaseId);
+
+        releases.Results.Remove(release);
+    }
+}
