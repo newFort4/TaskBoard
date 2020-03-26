@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskBoard.Enums;
 using TaskBoard.Models;
 using TaskBoard.ViewModels;
+using TaskBoard.ViewModels.Tasks;
 
 namespace TaskBoard.Services
 {

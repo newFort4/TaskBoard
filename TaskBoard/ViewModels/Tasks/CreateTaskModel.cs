@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using TaskBoard.Enums;
 
-namespace TaskBoard.ViewModels
+namespace TaskBoard.ViewModels.Tasks
 {
     public class CreateTaskModel
     {

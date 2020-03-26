@@ -22,5 +22,8 @@
   <ItemGroup>
     <Folder Include="Pages\Tasks\" />
     <Folder Include="Pages\UserRoleManager\" />
+    <Folder Include="Pages\Releases\" />
+    <Folder Include="ViewModels\Tasks\" />
+    <Folder Include="ViewModels\Releases\" />
   </ItemGroup>
 </Project>

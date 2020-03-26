@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TaskBoard.Enums;
 using TaskBoard.Models;
 
-namespace TaskBoard.ViewModels
+namespace TaskBoard.ViewModels.Tasks
 {
     public class TaskDetailsModel
     {

@@ -10,11 +10,13 @@ while @i < 1000
 begin
     insert into Tasks
      values (null,
+      null,
       concat('Task', cast(@i as varchar(max))),
       floor(rand()* (@typesCount + 1)),
       floor(rand()* (@statusesCount + 1)),
       floor(rand() * 101),
       concat('Descr', cast(@i as varchar(max))),
+      floor(rand() * 4),
       dateAdd(Day, Rand() * DateDiff(Day, @startDate, @endDate), @startDate),
       dateAdd(Day, Rand() * DateDiff(Day, @startDate, @endDate) + floor(rand() * 10), @startDate))
 

@@ -3,4 +3,9 @@ insert into AspNetRoles values('TaskReaders', 'TaskReaders', 'TASKREADERS', null
 insert into AspNetRoles values('TaskEditors', 'TaskEditors', 'TASKEDITORS', null); --Task editors
 insert into AspNetRoles values('TaskDeletors', 'TaskDeletors', 'TASKDELETORS', null); --Task deletors
 
+insert into AspNetRoles values('ReleaseCreators', 'ReleaseCreators', 'RELEASECREATORS', null); --Release creators
+insert into AspNetRoles values('ReleaseReaders', 'ReleaseReaders', 'RELEASEREADERS', null); --Release readers
+insert into AspNetRoles values('ReleaseEditors', 'ReleaseEditors', 'RELEASEEDITORS', null); --Release editors
+insert into AspNetRoles values('ReleaseDeletors', 'ReleaseDeletors', 'RELEASEDELETORS', null); --Release deletors
+
 insert into AspNetRoles values('Administrators', 'Administrators', 'ADMINISTRATORS', null); --Administrators

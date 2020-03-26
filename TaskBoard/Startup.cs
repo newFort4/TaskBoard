@@ -35,6 +35,7 @@ namespace TaskBoard
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddScoped<TasksService>();
+            services.AddScoped<ReleasesService>();
 
             services.AddAuthenticationCore();
         }
