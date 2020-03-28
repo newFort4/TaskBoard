@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using TaskBoard.Enums;
 
-namespace TaskBoard.ViewModels.Releases
+namespace TaskBoard.ViewModels.ReleasesModels
 {
     public class CreateReleaseModel
     {

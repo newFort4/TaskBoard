@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskBoard.Models;
 using TaskBoard.ViewModels;
-using TaskBoard.ViewModels.Releases;
+using TaskBoard.ViewModels.ReleasesModels;
 
 namespace TaskBoard.Services
 {

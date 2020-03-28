@@ -1,7 +1,7 @@
 using System;
 using TaskBoard.Enums;
 
-namespace TaskBoard.ViewModels.Tasks
+namespace TaskBoard.ViewModels.TasksModels
 {
     public class EditTaskModel
     {

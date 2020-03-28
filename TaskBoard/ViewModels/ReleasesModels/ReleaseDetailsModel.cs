@@ -2,7 +2,7 @@
 using TaskBoard.Enums;
 using TaskBoard.Models;
 
-namespace TaskBoard.ViewModels.Releases
+namespace TaskBoard.ViewModels.ReleasesModels
 {
     public class ReleaseDetailsModel
     {

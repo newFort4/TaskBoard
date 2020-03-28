@@ -1,6 +1,6 @@
 using System;
 
-namespace TaskBoard.ViewModels.Releases
+namespace TaskBoard.ViewModels.ReleasesModels
 {
     public class EditReleaseModel
     {
