@@ -30,6 +30,7 @@ namespace TaskBoard.Services
                 TaskId = task.TaskId,
                 AssignedTo = task.AssignedTo,
                 Title = task.Title,
+                StoryPoint = task.StoryPoint,
                 Type = task.Type,
                 Status = task.Status,
                 Progress = task.Progress,
@@ -42,11 +43,17 @@ namespace TaskBoard.Services
         {
             var boardTask = await db.Tasks.FindAsync(taskId);
 
+            if (boardTask == null)
+            {
+                return null;
+            }
+
             var dependentTasks = await db
                 .DependentTasks
                 .Include(x => x.MainTask)
                 .Include(x => x.SubTask)
-                .Where(x => x.SubTask.TaskId == boardTask.TaskId)
+                .AsNoTracking()
+                .Where(x => x.SubTask == boardTask)
                 .Select(x => x.MainTask)
                 .ToListAsync();
 
@@ -123,6 +130,7 @@ namespace TaskBoard.Services
                 Title = createTaskModel.Title,
                 Description = createTaskModel.Description,
                 AssignedTo = identityUser,
+                StoryPoint = createTaskModel.StoryPoint,
                 Status = Status.New,
                 Type = createTaskModel.Type,
                 Created = DateTime.Now,
@@ -142,6 +150,7 @@ namespace TaskBoard.Services
             task.AssignedTo = identityUser;
             task.Title = editTaskModel.Title;
             task.Type = editTaskModel.Type;
+            task.StoryPoint = editTaskModel.StoryPoint;
             task.Status = editTaskModel.Status;
             task.Progress = editTaskModel.Progress;
             task.Description = editTaskModel.Description;

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskBoard.Models;
+using TaskBoard.Pages.TasksPages;
 using TaskBoard.ViewModels;
 using TaskBoard.ViewModels.ReleasesModels;
 
@@ -36,9 +37,17 @@ namespace TaskBoard.Services
 
         public async Task<ReleaseDetailsModel> GetReleaseAsync(int releaseId)
         {
-            var release = await db.Releases.FindAsync(releaseId);
+            var release = await db
+                .Releases
+                .Include(x => x.AssignedTo)
+                .SingleAsync(x => x.ReleaseId == releaseId);
+            var tasks = await db
+                .Tasks
+                .Include(x => x.Release)
+                .Where(x => x.Release == release)
+                .ToListAsync();
 
-            var releaseDetailsModel = ReleaseDetailsModel.ToControllerModel(release);
+            var releaseDetailsModel = ReleaseDetailsModel.ToControllerModel(release, tasks);
 
             return releaseDetailsModel;
         }
@@ -122,6 +131,36 @@ namespace TaskBoard.Services
         public async Task RemoveReleaseAsync(int releaseId)
         {
             db.Releases.Remove(await db.Releases.FindAsync(releaseId));
+            await db.SaveChangesAsync();
+        }
+
+        public async Task AddTaskAsync(AddTaskModel addTaskModel)
+        {
+            var release = await db.Releases.FindAsync(addTaskModel.ReleaseId);
+
+            if (release == null)
+            {
+                throw new Exception("The release doesn't exist.");
+            }
+
+            var task = await db.Tasks.FindAsync(addTaskModel.TaskId);
+
+            if (task == null)
+            {
+                throw new Exception("The task doesnt't exist.");
+            }
+
+            task.Release = release;
+
+            await db.SaveChangesAsync();
+        }
+
+        public async Task RemoveTaskFromReleaseAsync(int taskId)
+        {
+            var task = await db.Tasks.FindAsync(taskId);
+
+            task.Release = null;
+
             await db.SaveChangesAsync();
         }
     }

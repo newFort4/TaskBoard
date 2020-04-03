@@ -4,6 +4,7 @@
 @using Services
 @using ViewModels.ReleasesModels
 
+@inject NavigationManager NavigationManager
 @inject ReleasesService ReleasesService
 
 @if (release == null)
@@ -12,13 +13,68 @@
 }
 else
 {
-    <div class="col-6">
-        <div class="card">
-            <div class="card-header">Release #@release.ReleaseId</div>
-            <div class="card-body">
-                <h5 class="card-title">@release.Title</h5>
-                <p class="card-text">@release.Description</p>
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">Release #@release.ReleaseId</div>
+                <div class="card-body">
+                    <h5 class="card-title">@release.Title</h5>
+                    <div>Story points: @release.Tasks.Sum(x => x.StoryPoint)</div>
+                    <div><progress value="@release.Tasks.Average(x => x.Progress)" max="100" /> @Math.Round(release.Tasks.Average(x => x.Progress), 2) %</div>
+                    <div class="card-text">@release.Description</div>
+                    <div>
+                        <ul class="list-group">
+                            @foreach (var task in release.Tasks)
+                            {
+                                <li class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="card-title">
+                                            <a href="/task-details/@task.TaskId">@task.Title</a>
+                                        </h6>
+                                        <div>
+                                            <button class="btn btn-danger" @onclick="async () => await RemoveTaskFromReleaseAsync(task.TaskId)">
+                                                <span class="oi oi-trash"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div>Story points: @task.StoryPoint</div>
+                                    <div><progress value="@task.Progress" max="100" /> @task.Progress %</div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <AuthorizeView Roles="ReleaseEditors">
+                    <div class="card-footer">
+                        <a class="btn btn-link" href="/edit-release/@ReleaseId">Edit</a>
+                    </div>
+                </AuthorizeView>
             </div>
+        </div>
+        <div class="col-6">
+            <EditForm Model="@addTaskModel" OnValidSubmit="async() => await OnAddTaskFormSubmit()">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="card">
+                    <div class="card-header">Tasks</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="taskId">Task Id:</label>
+                            <InputNumber id="taskId" class="form-control" @bind-Value="addTaskModel.TaskId" min="1" step="1" />
+                        </div>
+                        @if (addingTaskErrorMessage != null)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @addingTaskErrorMessage
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </div>
+                </div>
+            </EditForm>
         </div>
     </div>
 }
@@ -28,10 +84,33 @@ else
     public int ReleaseId { get; set; }
 
     private ReleaseDetailsModel release { get; set; }
-    private int dependentReleaseId { get; set; }
+    private AddTaskModel addTaskModel { get; set; }
+
+    private string addingTaskErrorMessage = null;
 
     protected async override Task OnParametersSetAsync()
     {
+        addTaskModel = new AddTaskModel(ReleaseId);
         release = await ReleasesService.GetReleaseAsync(ReleaseId);
+    }
+
+    private async Task OnAddTaskFormSubmit()
+    {
+        try
+        {
+            await ReleasesService.AddTaskAsync(addTaskModel);
+
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        } catch (Exception e)
+        {
+            addingTaskErrorMessage = e.Message;
+        }
+    }
+
+    private async Task RemoveTaskFromReleaseAsync(int taskId)
+    {
+        await ReleasesService.RemoveTaskFromReleaseAsync(taskId);
+
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
 }

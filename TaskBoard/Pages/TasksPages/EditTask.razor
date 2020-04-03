@@ -43,6 +43,10 @@ else
                         </InputSelect>
                     </div>
                     <div class="form-group">
+                        <label for="storyPoints">Story points:</label>
+                        <InputNumber id="storyPoints" class="form-control" @bind-Value="editTaskModel.StoryPoint" />
+                    </div>
+                    <div class="form-group">
                         <label for="progress">Progress:</label>
                         <InputNumber id="progress" class="form-control" min="0" step="1" max="100" @bind-Value="editTaskModel.Progress" />
                         <div><progress value="@editTaskModel.Progress" max="100" /> @editTaskModel.Progress %</div>

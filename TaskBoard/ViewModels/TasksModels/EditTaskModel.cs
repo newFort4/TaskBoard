@@ -8,6 +8,7 @@ namespace TaskBoard.ViewModels.TasksModels
         public int TaskId { get; set; }
         public string AssignedTo { get; set; }
         public string Title { get; set; }
+        public int StoryPoint { get; set; }
         public TaskType Type { get; set; }
         public Status Status { get; set; }
         public int Progress { get; set; }

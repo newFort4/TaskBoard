@@ -12,34 +12,44 @@
 }
 else
 {
-    <div class="col-6">
-        <div class="card">
-            <div class="card-header">@task.Type</div>
-            <div class="card-body">
-                <h5 class="card-title">@task.Title</h5>
-                <p><progress value="@task.Progress" max="100" /> @task.Progress %</p>
-                <p class="card-text">@task.Description</p>
-
-                <!--<EditForm OnValidSubmit="async() => await AddDependentTaskAsync()">-->
-                <form>
-                    <!--<DataAnnotationsValidator />
-                    <ValidationSummary />-->
-
-
-                    <div class="form-group">
-                        <label for="dependentTaskId">Dependent task id:</label>
-                        <input id="dependentTaskId" type="number" class="form-control" @bind="dependentTaskId" />
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">@task.Type</div>
+                <div class="card-body">
+                    <h5 class="card-title">@task.Title</h5>
+                    <p>Story points: @task.StoryPoint</p>
+                    <p><progress value="@task.Progress" max="100" /> @task.Progress %</p>
+                    <p class="card-text">@task.Description</p>
+                </div>
+                <AuthorizeView Roles="TaskEditors">
+                    <div class="card-footer">
+                        <a class="btn btn-link" href="/edit-task/@TaskId">Edit</a>
                     </div>
+                </AuthorizeView>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">Dependant tasks</div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="dependentTaskId">Dependent task id:</label>
+                            <input id="dependentTaskId" type="number" class="form-control" @bind="dependentTaskId" />
+                        </div>
 
-                    <button type="submit" class="btn btn-primary" @onclick="async() => await AddDependentTaskAsync()">Add</button>
-                </form>
-                <!--</EditForm>-->
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary" @onclick="async() => await AddDependentTaskAsync()">Add</button>
+                        </div>
+                    </form>
 
-                <div class="list-group">
-                    @foreach (var dependentTask in task.DependentTasks)
-                    {
-                        <a class="list-group-item list-group-item-action" href="task-details/@dependentTask.TaskId">#@dependentTask.TaskId @dependentTask.Title</a>
-                    }
+                    <div class="list-group">
+                        @foreach (var dependentTask in task.DependentTasks)
+                        {
+                            <a class="list-group-item list-group-item-action" href="task-details/@dependentTask.TaskId">#@dependentTask.TaskId @dependentTask.Title</a>
+                        }
+                    </div>
                 </div>
             </div>
         </div>

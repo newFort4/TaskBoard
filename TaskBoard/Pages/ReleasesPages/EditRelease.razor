@@ -3,9 +3,11 @@
 
 @using Services
 @using ViewModels.ReleasesModels
+@using ViewModels.TasksModels
 
 @inject NavigationManager NavigationManager
 @inject ReleasesService ReleasesService
+@inject TasksService TasksService
 
 @if (editReleaseModel == null)
 {
@@ -13,11 +15,11 @@
 }
 else
 {
+<div class="row">
     <div class="col-6">
-        <EditForm Model="@editReleaseModel" OnValidSubmit="async() => await HandleValidSubmit()">
+        <EditForm Model="@editReleaseModel" OnValidSubmit="async() => await OnEditFormSubmit()">
             <DataAnnotationsValidator />
             <ValidationSummary />
-
 
             <div class="card">
                 <div class="card-header">@editReleaseModel.Title</div>
@@ -45,6 +47,7 @@ else
             </div>
         </EditForm>
     </div>
+</div>
 }
 
 @code {
@@ -58,7 +61,7 @@ else
         editReleaseModel = await ReleasesService.GetReleaseForEditAsync(ReleaseId);
     }
 
-    private async Task HandleValidSubmit()
+    private async Task OnEditFormSubmit()
     {
         await ReleasesService.EditReleaseAsync(editReleaseModel);
 
