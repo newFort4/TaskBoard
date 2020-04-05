@@ -29,7 +29,7 @@ namespace TaskBoard.ViewModels.ReleasesModels
                 Description = release.Description,
                 AssignedTo = release.AssignedTo?.Email,
                 ReleaseDate = release.ReleaseDate,
-                Tasks = boardTasks?.Select(x => TaskDetailsModel.ToControllerModel(x))
+                Tasks = boardTasks == null ? new List<TaskDetailsModel>() : boardTasks.Select(x => TaskDetailsModel.ToControllerModel(x))
             };
         }
     }
