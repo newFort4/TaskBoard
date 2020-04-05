@@ -1,10 +1,12 @@
 ﻿@attribute [Authorize]
 @page "/task-details/{TaskId:int}"
 
+@using Models
 @using Services
 @using ViewModels.ReleasesModels
 @using ViewModels.TasksModels
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject ReleasesService ReleasesService
 @inject TasksService TasksService
@@ -39,6 +41,50 @@ else
                     </div>
                 </AuthorizeView>
             </div>
+            <AuthorizeView>
+                <Authorized Context="Auth">
+                    <br />
+                    <div class="card">
+                        <div class="card-header">Comments</div>
+                        <div class="card-body">
+                            <div>
+                                <div>
+                                    <form class="form-inline" @onsubmit="async() => await AddCommentToTaskAsync(Auth.User.Identity.Name)">
+                                        <div class="form-group mx-sm-2 mb-2">
+                                            <label for="text" class="sr-only">Text:</label>
+                                            <input type="text" class="form-control" id="text" placeholder="Comment" @bind-value="addCommentToTaskModel.Text" />
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mb-2">Comment</button>
+                                    </form>
+                                </div>
+                                <br />
+                                <ul class="list-group">
+                                    @foreach (var taskComment in task.TaskComments)
+                                    {
+                                        <li class="@(taskComment.Text.ToLower().Contains(Auth.User.Identity.Name.ToLower()) ? "list-group-item-info " : "") list-group-item">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">@taskComment.IdentityUser.UserName</h5>
+                                                <small>
+                                                    @taskComment.Created
+                                                    @if (Auth.User.Identity.Name == taskComment.IdentityUser.UserName)
+                                                    {
+                                                        <button class="btn btn-danger" @onclick="async() => await DeleteCommentAsync(taskComment.TaskCommentId)"><span class="oi oi-trash"></span></button>
+                                                    }
+                                                </small>
+                                            </div>
+                                            <p class="mb-1">@taskComment.Text</p>
+                                            <small>Donec id elit non mi porta.</small>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <p>You are not authorized to track comments.</p>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
         <div class="col-6">
             @if (task.Release == null)
@@ -91,11 +137,14 @@ else
 
     private TaskDetailsModel task { get; set; }
     private int dependentTaskId { get; set; }
+    private AddCommentToTaskModel addCommentToTaskModel { get; set; }
 
     private int releaseId { get; set; }
 
     protected async override Task OnParametersSetAsync()
     {
+        task = null;
+        addCommentToTaskModel = new AddCommentToTaskModel(TaskId);
         task = await TasksService.GetTaskAsync(TaskId);
     }
 
@@ -114,5 +163,17 @@ else
         await ReleasesService.AddTaskAsync(addTaskModel);
 
         NavigationManager.NavigateTo(NavigationManager.Uri, true);
+    }
+
+    private async Task AddCommentToTaskAsync(string identityUserName)
+    {
+        await TasksService.AddCommentToTaskAsync(addCommentToTaskModel, identityUserName);
+        await OnParametersSetAsync();
+    }
+
+    private async Task DeleteCommentAsync(int taskCommentId)
+    {
+        await TasksService.DeleteCommentAsync(taskCommentId);
+        await OnParametersSetAsync();
     }
 }

@@ -20,6 +20,7 @@ namespace TaskBoard.ViewModels.TasksModels
         public DateTime Created { get; set; }
         public DateTime? DeadLine { get; set; }
         public List<TaskDetailsModel> DependentTasks { get; set; }
+        public List<TaskComment> TaskComments { get; set; }
 
         public static TaskDetailsModel ToControllerModel(BoardTask task)
         {
