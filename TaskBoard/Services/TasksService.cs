@@ -60,10 +60,19 @@ namespace TaskBoard.Services
                 .Select(x => x.MainTask)
                 .ToListAsync();
 
+            var taskComments = await db
+                .TaskComments
+                .Include(x => x.IdentityUser)
+                .Include(x => x.Task)
+                .Where(x => x.Task.TaskId == taskId)
+                .OrderByDescending(x => x.Created)
+                .ToListAsync();
+
             var taskDetailsModels = TaskDetailsModel.ToControllerModel(boardTask);
             taskDetailsModels.DependentTasks = dependentTasks
                 .Select(x => TaskDetailsModel.ToControllerModel(x))
                 .ToList();
+            taskDetailsModels.TaskComments = taskComments;
 
             return taskDetailsModels;
         }
@@ -204,6 +213,31 @@ namespace TaskBoard.Services
             };
 
             await db.DependentTasks.AddAsync(dependentTask);
+            await db.SaveChangesAsync();
+        }
+
+        public async Task AddCommentToTaskAsync(AddCommentToTaskModel addCommentToTaskModel, string identityUserName)
+        {
+            var identityUser = await userManager.FindByNameAsync(identityUserName);
+            var task = await db.Tasks.FindAsync(addCommentToTaskModel.TaskId);
+
+            var taskComment = new TaskComment
+            {
+                Text = addCommentToTaskModel.Text,
+                IdentityUser = identityUser,
+                Task = task,
+                Created = DateTime.Now
+            };
+
+            await db.TaskComments.AddAsync(taskComment);
+            await db.SaveChangesAsync();
+        }
+
+        public async Task DeleteCommentAsync(int taskCommentId)
+        {
+            var taskComment = await db.TaskComments.FindAsync(taskCommentId);
+
+            db.TaskComments.Remove(taskComment);
             await db.SaveChangesAsync();
         }
     }
