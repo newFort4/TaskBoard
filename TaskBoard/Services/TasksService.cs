@@ -41,7 +41,10 @@ namespace TaskBoard.Services
 
         public async Task<TaskDetailsModel> GetTaskAsync(int taskId)
         {
-            var boardTask = await db.Tasks.FindAsync(taskId);
+            var boardTask = await db
+                .Tasks
+                .Include(x => x.Release)
+                .SingleOrDefaultAsync(x => x.TaskId == taskId);
 
             if (boardTask == null)
             {

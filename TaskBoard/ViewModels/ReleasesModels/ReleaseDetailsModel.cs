@@ -17,6 +17,11 @@ namespace TaskBoard.ViewModels.ReleasesModels
 
         public static ReleaseDetailsModel ToControllerModel(Release release, IEnumerable<BoardTask> boardTasks)
         {
+            if (release == null)
+            {
+                return null;
+            }
+
             return new ReleaseDetailsModel
             {
                 ReleaseId = release.ReleaseId,
@@ -24,7 +29,7 @@ namespace TaskBoard.ViewModels.ReleasesModels
                 Description = release.Description,
                 AssignedTo = release.AssignedTo?.Email,
                 ReleaseDate = release.ReleaseDate,
-                Tasks = boardTasks.Select(x => TaskDetailsModel.ToControllerModel(x))
+                Tasks = boardTasks?.Select(x => TaskDetailsModel.ToControllerModel(x))
             };
         }
     }

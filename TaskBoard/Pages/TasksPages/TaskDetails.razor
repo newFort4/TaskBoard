@@ -2,8 +2,11 @@
 @page "/task-details/{TaskId:int}"
 
 @using Services
+@using ViewModels.ReleasesModels
 @using ViewModels.TasksModels
 
+@inject NavigationManager NavigationManager
+@inject ReleasesService ReleasesService
 @inject TasksService TasksService
 
 @if (task == null)
@@ -15,7 +18,15 @@ else
     <div class="row">
         <div class="col-6">
             <div class="card">
-                <div class="card-header">@task.Type</div>
+                <div class="card-header">
+                    <div class="float-left">@task.Type</div>
+                    @if (task.Release != null)
+                    {
+                        <div class="float-right">
+                            <a href="/release-details/@task.Release.ReleaseId">@task.Release.Title</a>
+                        </div>
+                    }
+                </div>
                 <div class="card-body">
                     <h5 class="card-title">@task.Title</h5>
                     <p>Story points: @task.StoryPoint</p>
@@ -30,6 +41,24 @@ else
             </div>
         </div>
         <div class="col-6">
+            @if (task.Release == null)
+            {
+                <div class="card">
+                    <div class="card-header">Add to release</div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="releaseId">Release id:</label>
+                                <input id="releaseId" type="number" class="form-control" @bind="releaseId" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary" type="submit" @onclick="async() => await AddToReleaseAsync()">Add</button>
+                    </div>
+                </div>
+                <br />
+            }
             <div class="card">
                 <div class="card-header">Dependant tasks</div>
                 <div class="card-body">
@@ -63,6 +92,8 @@ else
     private TaskDetailsModel task { get; set; }
     private int dependentTaskId { get; set; }
 
+    private int releaseId { get; set; }
+
     protected async override Task OnParametersSetAsync()
     {
         task = await TasksService.GetTaskAsync(TaskId);
@@ -73,5 +104,15 @@ else
         await TasksService.AddDependentTaskAsync(TaskId, Convert.ToInt32(dependentTaskId));
 
         await OnParametersSetAsync();
+    }
+
+    private async Task AddToReleaseAsync()
+    {
+        var addTaskModel = new AddTaskModel(releaseId);
+        addTaskModel.TaskId = TaskId;
+
+        await ReleasesService.AddTaskAsync(addTaskModel);
+
+        NavigationManager.NavigateTo(NavigationManager.Uri, true);
     }
 }

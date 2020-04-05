@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using TaskBoard.Enums;
 using TaskBoard.Models;
+using TaskBoard.ViewModels.ReleasesModels;
 
 namespace TaskBoard.ViewModels.TasksModels
 {
     public class TaskDetailsModel
     {
         public int TaskId { get; set; }
+        public ReleaseDetailsModel Release { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string AssignedTo { get; set; }
@@ -24,6 +26,7 @@ namespace TaskBoard.ViewModels.TasksModels
             return new TaskDetailsModel
             {
                 TaskId = task.TaskId,
+                Release = ReleaseDetailsModel.ToControllerModel(task.Release, null),
                 Title = task.Title,
                 Description = task.Description,
                 AssignedTo = task.AssignedTo?.Email,
