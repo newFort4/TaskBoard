@@ -120,6 +120,13 @@ else
                             <input id="dependentTaskId" type="number" class="form-control" @bind="dependentTaskId" />
                         </div>
 
+                        <div class="list-group">
+                            @foreach (var dependentTask in task.DependentTasks)
+                            {
+                                <a class="list-group-item list-group-item-action" href="task-details/@dependentTask.TaskId">#@dependentTask.TaskId @dependentTask.Title</a>
+                            }
+                        </div>
+
                         @if (addingDependentTaskErrorMessage != null)
                         {
                             <div class="alert alert-danger" role="alert">
@@ -127,13 +134,6 @@ else
                             </div>
                         }
                     </form>
-
-                    <div class="list-group">
-                        @foreach (var dependentTask in task.DependentTasks)
-                        {
-                            <a class="list-group-item list-group-item-action" href="task-details/@dependentTask.TaskId">#@dependentTask.TaskId @dependentTask.Title</a>
-                        }
-                    </div>
                 </div>
                 <div class="card-footer">
                     <button type="submit" class="btn btn-primary" @onclick="async() => await AddDependentTaskAsync()">Add</button>
