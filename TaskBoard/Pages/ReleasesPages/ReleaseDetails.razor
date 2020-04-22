@@ -14,7 +14,7 @@
 else
 { 
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             <div class="card">
                 <div class="card-header">Release #@release.ReleaseId</div>
                 <div class="card-body">
@@ -53,8 +53,9 @@ else
                     </div>
                 </AuthorizeView>
             </div>
+            <br />
         </div>
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             <EditForm Model="@addTaskModel" OnValidSubmit="async() => await OnAddTaskFormSubmit()">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -78,6 +79,7 @@ else
                     </div>
                 </div>
             </EditForm>
+            <br />
         </div>
     </div>
 }

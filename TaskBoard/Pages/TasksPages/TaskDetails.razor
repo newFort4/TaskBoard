@@ -18,7 +18,7 @@
 else
 {
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             <div class="card">
                 <div class="card-header">
                     <div class="float-left">@task.Type</div>
@@ -80,13 +80,14 @@ else
                             </div>
                         </div>
                     </div>
+                    <br />
                 </Authorized>
                 <NotAuthorized>
                     <p>You are not authorized to track comments.</p>
                 </NotAuthorized>
             </AuthorizeView>
         </div>
-        <div class="col-6">
+        <div class="col-12 col-md-6">
             @if (task.Release == null)
             {
                 <div class="card">

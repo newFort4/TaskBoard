@@ -15,39 +15,40 @@
 }
 else
 {
-<div class="row">
-    <div class="col-6">
-        <EditForm Model="@editReleaseModel" OnValidSubmit="async() => await OnEditFormSubmit()">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <EditForm Model="@editReleaseModel" OnValidSubmit="async() => await OnEditFormSubmit()">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-            <div class="card">
-                <div class="card-header">@editReleaseModel.Title</div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="title">Title:</label>
-                        <InputText id="title" class="form-control" @bind-Value="editReleaseModel.Title" />
+                <div class="card">
+                    <div class="card-header">@editReleaseModel.Title</div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="title">Title:</label>
+                            <InputText id="title" class="form-control" @bind-Value="editReleaseModel.Title" />
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <InputTextArea id="description" class="form-control" @bind-Value="editReleaseModel.Description" />
+                        </div>
+                        <div class="form-group">
+                            <label for="assignedTo">Assigned to:</label>
+                            <InputText id="assignedTo" class="form-control" @bind-Value="editReleaseModel.AssignedTo" />
+                        </div>
+                        <div class="form-group">
+                            <label for="deadLine">Release Date:</label>
+                            <input id="deadLine" class="form-control" @bind="editReleaseModel.ReleaseDate" placeholder="MM/dd/yyyy" @bind:format="MM/dd/yyyy" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="description">Description:</label>
-                        <InputTextArea id="description" class="form-control" @bind-Value="editReleaseModel.Description" />
-                    </div>
-                    <div class="form-group">
-                        <label for="assignedTo">Assigned to:</label>
-                        <InputText id="assignedTo" class="form-control" @bind-Value="editReleaseModel.AssignedTo" />
-                    </div>
-                    <div class="form-group">
-                        <label for="deadLine">Release Date:</label>
-                        <input id="deadLine" class="form-control" @bind="editReleaseModel.ReleaseDate" placeholder="MM/dd/yyyy" @bind:format="MM/dd/yyyy" />
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-primary">Edit</button>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-primary">Edit</button>
-                </div>
-            </div>
-        </EditForm>
+            </EditForm>
+            <br />
+        </div>
     </div>
-</div>
 }
 
 @code {
