@@ -143,6 +143,6 @@ else
     {
         await TasksService.RemoveTaskAsync(task.TaskId);
 
-        tasks.Results.Remove(task);
+        tasks.Remove(task);
     }
 }

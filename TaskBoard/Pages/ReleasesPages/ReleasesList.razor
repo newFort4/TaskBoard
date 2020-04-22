@@ -111,6 +111,6 @@ else
     {
         await ReleasesService.RemoveReleaseAsync(release.ReleaseId);
 
-        releases.Results.Remove(release);
+        releases.Remove(release);
     }
 }
