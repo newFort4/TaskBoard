@@ -98,6 +98,12 @@ else
                                 <input id="releaseId" type="number" class="form-control" @bind="releaseId" />
                             </div>
                         </form>
+                        @if (addingTaskToReleaseErrorMessage != null)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @addingTaskToReleaseErrorMessage
+                            </div>
+                        }
                     </div>
                     <div class="card-footer">
                         <button class="btn btn-primary" type="submit" @onclick="async() => await AddToReleaseAsync()">Add</button>
@@ -114,9 +120,12 @@ else
                             <input id="dependentTaskId" type="number" class="form-control" @bind="dependentTaskId" />
                         </div>
 
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary" @onclick="async() => await AddDependentTaskAsync()">Add</button>
-                        </div>
+                        @if (addingDependentTaskErrorMessage != null)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @addingDependentTaskErrorMessage
+                            </div>
+                        }
                     </form>
 
                     <div class="list-group">
@@ -125,6 +134,9 @@ else
                             <a class="list-group-item list-group-item-action" href="task-details/@dependentTask.TaskId">#@dependentTask.TaskId @dependentTask.Title</a>
                         }
                     </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary" @onclick="async() => await AddDependentTaskAsync()">Add</button>
                 </div>
             </div>
         </div>
@@ -141,6 +153,9 @@ else
 
     private int releaseId { get; set; }
 
+    private string addingTaskToReleaseErrorMessage { get; set; }
+    private string addingDependentTaskErrorMessage { get; set; }
+
     protected async override Task OnParametersSetAsync()
     {
         task = null;
@@ -150,9 +165,17 @@ else
 
     private async Task AddDependentTaskAsync()
     {
-        await TasksService.AddDependentTaskAsync(TaskId, Convert.ToInt32(dependentTaskId));
+        try
+        {
+            await TasksService.AddDependentTaskAsync(TaskId, Convert.ToInt32(dependentTaskId));
 
-        await OnParametersSetAsync();
+            addingDependentTaskErrorMessage = null;
+
+            await OnParametersSetAsync();
+        } catch (Exception e)
+        {
+            addingDependentTaskErrorMessage = e.Message;
+        }
     }
 
     private async Task AddToReleaseAsync()
@@ -160,9 +183,17 @@ else
         var addTaskModel = new AddTaskModel(releaseId);
         addTaskModel.TaskId = TaskId;
 
-        await ReleasesService.AddTaskAsync(addTaskModel);
+        try
+        {
+            await ReleasesService.AddTaskAsync(addTaskModel);
 
-        NavigationManager.NavigateTo(NavigationManager.Uri, true);
+            addingTaskToReleaseErrorMessage = null;
+
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
+        } catch (Exception e)
+        {
+            addingTaskToReleaseErrorMessage = e.Message;
+        }
     }
 
     private async Task AddCommentToTaskAsync(string identityUserName)
