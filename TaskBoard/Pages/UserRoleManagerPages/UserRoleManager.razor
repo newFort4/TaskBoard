@@ -12,56 +12,69 @@
 
 <h1>User Role Manager</h1>
 
-@if (identityUsers == null || identityRoles == null || identityUserRoles == null)
+@if (identityUsers == null || identityRolesGroups == null || identityUserRoles == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>User</th>
-                @foreach (var identityRole in identityRoles)
-                {
-                    <th>@identityRole.Name</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var identityUser in identityUsers)
-            {
+    @foreach (var identityRoles in identityRolesGroups)
+    {
+        <h4>@identityRoles.Key</h4>
+        <table class="table table-hover">
+            <thead>
                 <tr>
-                    <td>@identityUser.UserName</td>
-                    @foreach (var identityRole in identityRoles)
+                    <th>User</th>
+                    @foreach (var identityRole in identityRoles.Value)
                     {
-                <td>
-                    @if (identityUserRoles.Exists(x => x.UserId == identityUser.Id && x.RoleId == identityRole.Id))
-                    {
-                        <button class="btn btn-info" @onclick="async () => await RemoveFromRole(identityUser, identityRole)">Revoke</button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-info" @onclick="async () => await AddToRole(identityUser, identityRole)">Grant</button>
-                    }
-                </td>
+                        <th class="text-center">@identityRole.Name</th>
                     }
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var identityUser in identityUsers)
+                {
+                    <tr>
+                        <td style="width: 25%;">@identityUser.UserName</td>
+                        @foreach (var identityRole in identityRoles.Value)
+                        {
+                            <td class="text-center">
+                                @if (identityUserRoles.Exists(x => x.UserId == identityUser.Id && x.RoleId == identityRole.Id))
+                                {
+                                    <button class="btn btn-info" @onclick="async () => await RemoveFromRole(identityUser, identityRole)">Revoke</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-info" @onclick="async () => await AddToRole(identityUser, identityRole)">Grant</button>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 }
 
 @code {
     private List<IdentityUser> identityUsers { get; set; }
-    private List<IdentityRole> identityRoles { get; set; }
+    private Dictionary<string, List<IdentityRole>> identityRolesGroups { get; set; }
     private List<IdentityUserRole<string>> identityUserRoles { get; set; }
+
+    private readonly string[] roleGroupNames = new string[] { "Task", "Release", "Administrator" };
 
     protected async override Task OnInitializedAsync()
     {
         identityUsers = await UserManager.Users.ToListAsync();
-        identityRoles = await RoleManager.Roles.ToListAsync();
+        var identityRoles = await RoleManager.Roles.ToListAsync();
         identityUserRoles = await TaskBoardDbContext.UserRoles.ToListAsync();
+
+        identityRolesGroups = new Dictionary<string, List<IdentityRole>>();
+
+        foreach (var roleGroupName in roleGroupNames)
+        {
+            identityRolesGroups.Add(roleGroupName, identityRoles.Where(x => x.Name.Contains(roleGroupName)).ToList());
+        }
     }
 
     private async Task AddToRole(IdentityUser identityUser, IdentityRole identityRole)
